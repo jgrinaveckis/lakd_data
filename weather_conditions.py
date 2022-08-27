@@ -1,6 +1,8 @@
 import pandas as pd
 import logging
-from helpers import import_json, open_sqlite_connection
+import os, sys
+import json
+from helpers import import_json, open_sqlite_connection, check_table_availability
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -21,31 +23,27 @@ class WeatherConditions:
 
     def data_eng(self):
         device_cols = ['id','irenginys','numeris','pavadinimas','kilometras']
-        data = import_json(self.url, self.file_path, self.file_name)
-        df = pd.DataFrame(data)
+        data = import_json(self.url, self.file_path, self.file_name, dtypes=False)
+        df_dtypes = import_json(dtypes=True)
 
-        #All of data imported as 'object' so further casting needed
-        #As comparing is done only on 'vejo_greitis_vidut' its the one who values are casted.
-        df['vejo_greitis_vidut'] = df['vejo_greitis_vidut'].astype('float64')
+        df = pd.DataFrame(data)
+        df = df.astype(df_dtypes['wc_dtypes'])
+        df['surinkimo_data'] = pd.to_datetime(df['surinkimo_data'], format="%Y-%m-%dT%H:%M:%S.%f%z")
         df = df[(df['vejo_greitis_vidut'] >=2) & (df['matomumas'].notnull())]
 
         #Take device info and drop it from events table leaving only device id
         df_devices = df[device_cols]
         df_measures = df.drop(columns=device_cols[1:])
+        df_measures.rename(columns={"id":"device_id"}, inplace=True)
         df_measures = df_measures.loc[:,~df_measures.columns.str.startswith('konstrukcijos')]
-        
-        #https://stackoverflow.com/questions/12952546/sqlite3-interfaceerror-error-binding-parameter-1-probably-unsupported-type
-        df_measures = df_measures.applymap(str)
-        df_measures['surinkimo_data_unix'] = df['surinkimo_data_unix'].astype('int64')
         return df_measures, df_devices
         
 
     def write_to_sqlite(self, df_measures, df_devices):
         cursor, sql_conn = open_sqlite_connection(self.db_name)
-        devices_tbl = cursor.execute(f''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{self.device_table}' ''').fetchone()
-        measures_tbl = cursor.execute(f''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{self.measure_table}' ''').fetchone()
-        #check if device table exists
-        
+        devices_tbl = check_table_availability(cursor, self.device_table)
+        measures_tbl = check_table_availability(cursor, self.measure_table)
+
         if devices_tbl[0] != 1:
             logging.info(f"Table {self.device_table} is not in DB")
             df_devices.to_sql(f'{self.device_table}', sql_conn, index=False)
@@ -79,10 +77,10 @@ class WeatherConditions:
         else:
             logging.info(f"Table {self.measure_table} exists, updating...")
             latest_date = int(cursor.execute(f""" SELECT MAX(surinkimo_data_unix) FROM {self.measure_table} """).fetchone()[0])
-            current_data = cursor.execute(f""" SELECT * FROM {self.measure_table}""").fetchall()
+            current_data = cursor.execute(f""" SELECT DISTINCT device_id FROM {self.measure_table}""").fetchall()
             #id at 3rd place
-            current_ids = [line[2] for line in current_data]
-            df_measures_append = df_measures[(df_measures['id'].isin(current_ids)) | (df_measures['surinkimo_data_unix'] > latest_date)]
+            current_ids = [line[0] for line in current_data]
+            df_measures_append = df_measures[(~df_measures['device_id'].isin(current_ids)) | (df_measures['surinkimo_data_unix'] > latest_date)]
             try:
                 events_count = df_measures_append.to_sql(f"{self.measure_table}", sql_conn, if_exists='append', index=False)
                 logging.info(f"Table {self.measure_table} updated successfully")
