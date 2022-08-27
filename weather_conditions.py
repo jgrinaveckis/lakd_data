@@ -27,9 +27,6 @@ class WeatherConditions:
         #All of data imported as 'object' so further casting needed
         #As comparing is done only on 'vejo_greitis_vidut' its the one who values are casted.
         df['vejo_greitis_vidut'] = df['vejo_greitis_vidut'].astype('float64')
-        df['kilometras'] = df['kilometras'].astype('float64')
-        df['surinkimo_data_unix'] = df['surinkimo_data_unix'].astype('int64')
-
         df = df[(df['vejo_greitis_vidut'] >=2) & (df['matomumas'].notnull())]
 
         #Take device info and drop it from events table leaving only device id
