@@ -33,7 +33,7 @@ class WeatherConditions:
         df_devices = df[device_cols]
         df_measures = df.drop(columns=device_cols[1:])
         df_measures = df_measures.loc[:,~df_measures.columns.str.startswith('konstrukcijos')]
-        #df_measures['ilguma'] = df['ilguma'].astype('str')
+        
         #https://stackoverflow.com/questions/12952546/sqlite3-interfaceerror-error-binding-parameter-1-probably-unsupported-type
         df_measures = df_measures.applymap(str)
         df_measures['surinkimo_data_unix'] = df['surinkimo_data_unix'].astype('int64')
