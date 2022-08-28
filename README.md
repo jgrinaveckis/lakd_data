@@ -10,8 +10,8 @@ Usage is pretty simple - run main.py with/without additional flag ```--update_sp
 * Flag == **wc** - WeatherConditions tables are updated
 * Any other values for this flag leads to exit of the script.
 
-Data types for tables can be found under configs folder in dtypes.json file. These are for reference purposes. <br>
-Config with all relevant (DB, tables names and URLs) is under config.ini
+Data types for tables can be found under configs folder in **dtypes.json** file. These are for reference purposes. <br>
+Config with all relevant (DB, tables names and URLs) is under **config.ini**
 
 ### Weather Condition
 
