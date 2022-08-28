@@ -16,16 +16,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     #Nothing provided - go for all
-    if len(sys.argv) == 0:
+    if not len(sys.argv) > 1:
         wc = WeatherConditions(db_name=cfg['SQLITE']['DbName'], 
                                 url=cfg['URL']['WeatherConditions'], 
                                 file_path="b", 
                                 file_name="c", 
                                 device_table=cfg['WeatherConditions']['DeviceTable'], 
-                                measure_table=cfg['WeatherConditions']['MeasureTable']
+                                measure_table=cfg['WeatherConditions']['MeasureTable'],
+                                warning_table=cfg['WeatherConditions']['WarningTable']
                             )
-        df_wc_measures, df_wc_devices = wc.data_eng()
-        wc.write_to_sqlite(df_wc_measures, df_wc_devices)
+        df_wc_measures, df_wc_devices, df_wc_warnings = wc.data_eng()
+        wc.write_to_sqlite(df_wc_measures, df_wc_devices, df_wc_warnings)
 
         ti = TrafficIntensity(
                                 db_name=cfg['SQLITE']['DbName'], 
@@ -43,10 +44,11 @@ if __name__ == "__main__":
                                 file_path="b", 
                                 file_name="c", 
                                 device_table=cfg['WeatherConditions']['DeviceTable'], 
-                                measure_table=cfg['WeatherConditions']['MeasureTable']
+                                measure_table=cfg['WeatherConditions']['MeasureTable'],
+                                warning_table=cfg['WeatherConditions']['WarningTable']
                             )
-        df_wc_measures, df_wc_devices = wc.data_eng()
-        wc.write_to_sqlite(df_wc_measures, df_wc_devices)
+        df_wc_measures, df_wc_devices, df_wc_warnings = wc.data_eng()
+        wc.write_to_sqlite(df_wc_measures, df_wc_devices, df_wc_warnings)
     elif args.update_specific_part[0] == 'ti':
         ti = TrafficIntensity(
                                 db_name=cfg['SQLITE']['DbName'], 

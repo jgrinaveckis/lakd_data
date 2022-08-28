@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import logging
-from helpers import import_json, open_sqlite_connection, check_table_availability
+from helpers import import_json, open_sqlite_connection, check_table_availability, update_table
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -9,10 +9,10 @@ class TrafficIntensity:
     def __init__(self,
                  db_name:str,
                  url:str, 
-                 file_path:str, 
-                 file_name:str,
                  device_table:str,
-                 measure_table:str):
+                 measure_table:str,
+                 file_path=None, 
+                 file_name=None):
         self.db_name = db_name
         self.url = url
         self.file_path = file_path
@@ -39,9 +39,7 @@ class TrafficIntensity:
         df_measures.drop(columns=[0], inplace=True)
 
         df_measures['date'] = pd.to_datetime(df_measures['date'], format="%Y-%m-%dT%H:%M:%S.%f%z")
-        df_measures['averageSpeed'] = df_measures['averageSpeed'].astype('float64')
         df_measures = df_measures[df_measures['averageSpeed'] > 80]
-
         return df_devices, df_measures
 
     def write_to_sqlite(self, df_measures, df_devices):
@@ -81,17 +79,6 @@ class TrafficIntensity:
             except Exception as e:
                 logging.info(e)
         else:
-            logging.info(f"Table {self.measure_table} exists, updating...")
-            latest_date = cursor.execute(f""" SELECT MAX(date) FROM {self.measure_table} """).fetchone()[0]
-            current_data = cursor.execute(f""" SELECT * FROM {self.measure_table}""").fetchall()
-            #id at 1st place
-            current_ids = [line[0] for line in current_data]
-            df_measures_append = df_measures[(~df_measures['device_id'].isin(current_ids)) | (df_measures['date'] > latest_date)]
-            try:
-                events_count = df_measures_append.to_sql(f"{self.measure_table}", sql_conn, if_exists='append', index=False)
-                logging.info(f"Table {self.measure_table} updated successfully")
-                logging.info(f"{events_count} new devices were added")
-            except Exception as e:
-                logging.info(e)
+            update_table(sql_conn, cursor, df_measures, self.measure_table, 'device_id', 'date', unix_date=False)
 
         
