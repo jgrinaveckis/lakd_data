@@ -52,7 +52,7 @@ def update_table(sql_conn, cursor, df:pd.DataFrame, table_name, id_column, date_
     try:
         events_count = df_measures_append.to_sql(f"{table_name}", sql_conn, if_exists='append', index=False)
         logging.info(f"Table {table_name} updated successfully")
-        logging.info(f"{events_count} new devices were added")
+        logging.info(f"{events_count} new rows were added")
     except Exception as e:
         logging.info(e) 
 
