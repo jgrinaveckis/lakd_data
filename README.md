@@ -10,12 +10,15 @@ Usage is pretty simple - run main.py with/without additional flag ```--update_sp
 * Flag == **wc** - WeatherConditions tables are updated
 * Any other values for this flag leads to exit of the script.
 
+Data types for tables can be found under configs folder in dtypes.json file. These are for reference purposes. <br>
+Config with all relevant (DB, tables names and URLs) is under config.ini
+
 ### Weather Condition
 
-Here we have three (wc_devices, wc_measures, wc_warnings) tables that are related by id fields (device_id in measures/warnings). <br>
+Here we have three (*wc_devices*, *wc_measures*, *wc_warnings*) tables that are related by id fields (device_id in measures/warnings). <br>
 Measures/warnings act as fact and devices as dimensional tables. <br>
 
 ### Traffic Intensity
 
-Here we have two (wc_devices, wc_measures) tables that are related by id fields (device_id in measures/warnings). <br>
+Here we have two (*wc_devices*, *wc_measures*) tables that are related by id fields (device_id in measures/warnings). <br>
 Measures act as fact and devices as dimensional tables. <br>

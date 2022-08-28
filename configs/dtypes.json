@@ -21,11 +21,12 @@
                  "trafficType": "category"
                 
     },
-    "wc_dtypes": {"surinkimo_data_unix": "int",
-                    "id":"int",
-                    "irenginys": "str",
-                    "pavadinimas": "str",
-                    "kilometras": "float",
+    "wc_dtypes": {
+        "surinkimo_data_unix": "int",
+        "id":"int",
+        "irenginys": "str",
+        "pavadinimas": "str",
+        "kilometras": "float",
                     "oro_temperatura":"float",
                     "vejo_greitis_vidut": "float",
                     "krituliu_tipas": "str",
@@ -42,5 +43,12 @@
                     "platuma": "int",
                     "lat": "float",
                     "lng": "float"
+    },
+    "wc_warnings_dtypes": {
+        "device_id": "int",
+        "pavadinimas": "str",
+        "kodas": "str",
+        "surinkimo_data_unix": "int",
+        "surinkimo_data": "datetime"
     }
 }
