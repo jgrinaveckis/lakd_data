@@ -18,7 +18,7 @@ def import_json(url=None, file_path=None, file_name=None, dtypes=None):
             else:
                 return json.loads(resp.read())
         else:
-            with open(os.path.join(sys.path[0], "dtypes.json"), "r") as f:
+            with open(os.path.join(sys.path[0], "configs/dtypes.json"), "r") as f:
                 return json.load(f)
     except Exception as e:
         print(e)

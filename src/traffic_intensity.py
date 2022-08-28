@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import logging
-from helpers import import_json, open_sqlite_connection, check_table_availability, update_table
+from helpers.helpers import import_json, open_sqlite_connection, check_table_availability, update_table
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 

@@ -1,12 +1,12 @@
-from weather_conditions import WeatherConditions
-from traffic_intensity import TrafficIntensity
+from src.weather_conditions import WeatherConditions
+from src.traffic_intensity import TrafficIntensity
 import configparser
 import argparse
 import sys
 
 if __name__ == "__main__":
     cfg = configparser.ConfigParser()
-    cfg.read('config.ini')
+    cfg.read('configs/config.ini')
     parser = argparse.ArgumentParser(description="Provide arguments!")
     parser.add_argument("--update_specific_part",
                          type=str,
